@@ -1,7 +1,7 @@
-export default function ImageGalleryItem({ webformatURL }) {
+export default function ImageGalleryItem({ webformatURL, tags }) {
   return (
-    <li class="gallery-item">
-      <img src={webformatURL} alt="" />
+    <li className="gallery-item">
+      <img className="gallery-item__image" src={webformatURL} alt={tags} />
     </li>
   );
 }
