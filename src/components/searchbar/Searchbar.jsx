@@ -1,6 +1,7 @@
 import { ImSearch } from 'react-icons/im';
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import css from './Searchbar.module.css';
 
 export default class Searchbar extends Component {
   state = {
@@ -25,14 +26,14 @@ export default class Searchbar extends Component {
   render() {
     const { searchQuery } = this.state;
     return (
-      <header className="searchbar">
-        <form className="form" onSubmit={this.handleSubmit}>
-          <button type="submit" className="search-button">
-            <ImSearch className="search-icon" />
+      <header className={css.searchbar}>
+        <form className={css.form} onSubmit={this.handleSubmit}>
+          <button type="submit" className={css.search__button}>
+            <ImSearch className={css.search__icon} />
           </button>
 
           <input
-            className="input"
+            className={css.input}
             type="text"
             autoComplete="off"
             autoFocus

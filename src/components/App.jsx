@@ -1,12 +1,13 @@
 import Searchbar from './searchbar/Searchbar';
 import ImageGallery from './imageGallery/ImageGallery';
 import Modal from './modal/Modal';
-import { Component } from 'react';
-import apiService from 'services/api';
 import Loader from './loader/Loader';
 import Button from './button/Button';
+import apiService from 'services/api';
+import { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import css from './App.module.css';
 
 export class App extends Component {
   state = {
@@ -29,6 +30,7 @@ export class App extends Component {
       this.setState({ loading: true });
       try {
         const data = await apiService(searchQuery, page);
+        this.setState({ totalImages: data.totalHits });
         if (data.totalHits === 0) {
           this.setState({ images: [] });
           toast.info(
@@ -37,7 +39,6 @@ export class App extends Component {
           return;
         }
         this.setState({ images: [...images, ...data.hits] });
-        this.setState({ totalImages: data.totalHits });
       } catch (error) {
         this.setState({ error });
         toast.error('Sorry, an error occurred. Please try again.');
@@ -70,10 +71,11 @@ export class App extends Component {
   };
 
   render() {
-    const { showModal, images, showImage, loading, totalImages, error } = this.state;
+    const { showModal, images, showImage, loading, totalImages, error } =
+      this.state;
 
     return (
-      <div className="app">
+      <div className={css.app}>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
         {loading && <Loader />}
         {images && <ImageGallery images={images} onClick={this.toggleModal} />}
@@ -84,10 +86,10 @@ export class App extends Component {
             tags={showImage.tags}
           />
         )}
-        {totalImages > images.length && !error && (
+        {totalImages > images.length && !loading && !error && (
           <Button handleLoadMore={this.handleLoadMore} />
         )}
-        <ToastContainer />        
+        <ToastContainer autoClose={3000} />
       </div>
     );
   }

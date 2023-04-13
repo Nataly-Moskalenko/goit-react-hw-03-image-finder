@@ -1,3 +1,5 @@
+import css from './ImageGalleryItem.module.css';
+
 export default function ImageGalleryItem({
   webformatURL,
   largeImageURL,
@@ -5,9 +7,9 @@ export default function ImageGalleryItem({
   onClick,
 }) {
   return (
-    <li className="gallery-item">
+    <li className={css.galleryItem}>
       <img
-        className="gallery-item__image"
+        className={css.galleryItem__image}
         src={webformatURL}
         data-source={largeImageURL}
         alt={tags}

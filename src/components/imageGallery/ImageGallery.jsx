@@ -1,8 +1,9 @@
 import ImageGalleryItem from 'components/imageGalleryItem/ImageGalleryItem';
+import css from './ImageGallery.module.css';
 
 export default function ImageGallery({ images, onClick }) {
   return (
-    <ul className="gallery">
+    <ul className={css.gallery}>
       {images.map(image => (
         <ImageGalleryItem
           key={image.id}
