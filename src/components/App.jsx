@@ -3,7 +3,7 @@ import ImageGallery from './imageGallery/ImageGallery';
 import Modal from './modal/Modal';
 import Loader from './loader/Loader';
 import Button from './button/Button';
-import apiService from 'services/api';
+import apiService from 'services/apiService';
 import { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,10 +23,7 @@ export class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { images, searchQuery, page } = this.state;
-    if (
-      (prevState.searchQuery !== searchQuery && prevProps.images !== images) ||
-      prevState.page !== page
-    ) {
+    if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
       this.setState({ loading: true });
       try {
         const data = await apiService(searchQuery, page);
@@ -78,7 +75,7 @@ export class App extends Component {
       <div className={css.app}>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
         {images && <ImageGallery images={images} onClick={this.toggleModal} />}
-        {showModal && (
+        {showModal && showImage && (
           <Modal
             onClose={this.toggleModal}
             src={showImage.dataset.source}
