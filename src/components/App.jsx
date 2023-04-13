@@ -5,6 +5,8 @@ import { Component } from 'react';
 import apiService from 'services/api';
 import Loader from './loader/Loader';
 import Button from './button/Button';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export class App extends Component {
   state = {
@@ -19,27 +21,26 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
+    const { images, searchQuery, page } = this.state;
     if (
-      (prevState.searchQuery !== this.state.searchQuery &&
-        prevProps.images !== this.state.images) ||
-      prevState.page !== this.state.page
+      (prevState.searchQuery !== searchQuery && prevProps.images !== images) ||
+      prevState.page !== page
     ) {
       this.setState({ loading: true });
       try {
-        const data = await apiService(this.state.searchQuery, this.state.page);
-        this.setState({ totalImages: data.totalHits });
+        const data = await apiService(searchQuery, page);
         if (data.totalHits === 0) {
           this.setState({ images: [] });
-          window.alert(
-            `Sorry, there are no images with ${this.state.searchQuery}. Please try again.`
+          toast.info(
+            `Sorry, there are no images with ${searchQuery}. Please try again.`
           );
           return;
         }
-        this.setState({
-          images: [...this.state.images, ...data.hits],
-        });
+        this.setState({ images: [...images, ...data.hits] });
+        this.setState({ totalImages: data.totalHits });
       } catch (error) {
         this.setState({ error });
+        toast.error('Sorry, an error occurred. Please try again.');
       } finally {
         this.setState({ loading: false });
       }
@@ -47,10 +48,11 @@ export class App extends Component {
   }
 
   toggleModal = e => {
+    const { showModal } = this.state;
     this.setState(({ showModal }) => ({
       showModal: !showModal,
     }));
-    if (this.state.showModal === false) {
+    if (showModal === false) {
       this.setState({ showImage: e.target });
     }
   };
@@ -68,12 +70,10 @@ export class App extends Component {
   };
 
   render() {
-    const { showModal, images, showImage, error, loading, totalImages } =
-      this.state;
+    const { showModal, images, showImage, loading, totalImages, error } = this.state;
 
     return (
       <div className="app">
-        {error && <p>{error.message}</p>}
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
         {loading && <Loader />}
         {images && <ImageGallery images={images} onClick={this.toggleModal} />}
@@ -84,9 +84,10 @@ export class App extends Component {
             tags={showImage.tags}
           />
         )}
-        {totalImages > images.length && (
+        {totalImages > images.length && !error && (
           <Button handleLoadMore={this.handleLoadMore} />
         )}
+        <ToastContainer />        
       </div>
     );
   }
