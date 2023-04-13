@@ -77,18 +77,18 @@ export class App extends Component {
     return (
       <div className={css.app}>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
-        {loading && <Loader />}
         {images && <ImageGallery images={images} onClick={this.toggleModal} />}
         {showModal && (
           <Modal
             onClose={this.toggleModal}
-            largeImageURL={showImage.dataset.source}
-            tags={showImage.tags}
+            src={showImage.dataset.source}
+            alt={showImage.alt}
           />
         )}
-        {totalImages > images.length && !loading && !error && (
+        {totalImages > images.length && images && !loading && !error && (
           <Button handleLoadMore={this.handleLoadMore} />
         )}
+        {loading && <Loader />}
         <ToastContainer autoClose={3000} />
       </div>
     );

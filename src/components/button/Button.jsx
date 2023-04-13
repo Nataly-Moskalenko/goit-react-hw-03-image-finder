@@ -1,4 +1,5 @@
 import css from './Button.module.css';
+import PropTypes from 'prop-types';
 
 export default function Button({ handleLoadMore }) {
   return (
@@ -11,3 +12,7 @@ export default function Button({ handleLoadMore }) {
     </button>
   );
 }
+
+Button.propTypes = {
+  handleLoadMore: PropTypes.func.isRequired,
+};
