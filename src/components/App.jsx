@@ -13,9 +13,9 @@ export class App extends Component {
     searchQuery: '',
     error: null,
     page: 1,
+    totalImages: 0,
     showImage: null,
     loading: false,
-    // status: 'idle',
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -24,17 +24,25 @@ export class App extends Component {
         prevProps.images !== this.state.images) ||
       prevState.page !== this.state.page
     ) {
-      // this.setState({ status: 'pending' });
       this.setState({ loading: true });
-      await apiService(this.state.searchQuery, this.state.page)
-        .then(data =>
-          this.setState({
-            images: [...this.state.images, ...data.hits],
-            status: 'resolved',
-          })
-        )
-        .catch(error => this.setState({ error, status: 'rejected' }))
-        .finally(this.setState({ loading: false }));
+      try {
+        const data = await apiService(this.state.searchQuery, this.state.page);
+        this.setState({ totalImages: data.totalHits });
+        if (data.totalHits === 0) {
+          this.setState({ images: [] });
+          window.alert(
+            `Sorry, there are no images with ${this.state.searchQuery}. Please try again.`
+          );
+          return;
+        }
+        this.setState({
+          images: [...this.state.images, ...data.hits],
+        });
+      } catch (error) {
+        this.setState({ error });
+      } finally {
+        this.setState({ loading: false });
+      }
     }
   }
 
@@ -48,7 +56,7 @@ export class App extends Component {
   };
 
   handleSearchbarSubmit = searchQuery => {
-    this.setState({ searchQuery });
+    this.setState({ searchQuery, page: 1, images: [] });
   };
 
   handleLoadMore = () => {
@@ -60,46 +68,8 @@ export class App extends Component {
   };
 
   render() {
-    const { showModal, images, showImage, error, loading } = this.state;
-    // if (status === 'idle') {
-    //   return (
-    //     <div className="app">
-    //       <Searchbar onSubmit={this.handleSearchbarSubmit} />
-    //     </div>
-    //   );
-    // }
-    // if (status === 'pending') {
-    //   return (
-    //     <div className="app">
-    //       <Searchbar onSubmit={this.handleSearchbarSubmit} />
-    //       <Loader />
-    //     </div>
-    //   );
-    // }
-    // if (status === 'rejected') {
-    //   return (
-    //     <div className="app">
-    //       <Searchbar onSubmit={this.handleSearchbarSubmit} />
-    //       <p>{error.message}</p>
-    //     </div>
-    //   );
-    // }
-    // if (status === 'resolved') {
-    //   return (
-    //     <div className="app">
-    //       <Searchbar onSubmit={this.handleSearchbarSubmit} />
-    //       <ImageGallery images={images} onClick={this.toggleModal} />
-    //       {showModal && (
-    //         <Modal
-    //           onClose={this.toggleModal}
-    //           largeImageURL={showImage.dataset.source}
-    //           tags={showImage.tags}
-    //         />
-    //       )}
-    //       <Button handleLoadMore={this.handleLoadMore} />
-    //     </div>
-    //   );
-    // }
+    const { showModal, images, showImage, error, loading, totalImages } =
+      this.state;
 
     return (
       <div className="app">
@@ -114,7 +84,9 @@ export class App extends Component {
             tags={showImage.tags}
           />
         )}
-        {images.length >= 12 && <Button handleLoadMore={this.handleLoadMore} />}
+        {totalImages > images.length && (
+          <Button handleLoadMore={this.handleLoadMore} />
+        )}
       </div>
     );
   }
