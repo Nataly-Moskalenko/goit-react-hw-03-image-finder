@@ -56,7 +56,11 @@ export class App extends Component {
   };
 
   handleSearchbarSubmit = searchQuery => {
-    this.setState({ searchQuery, page: 1, images: [] });
+    if (searchQuery !== this.state.searchQuery) {
+      this.setState({ searchQuery, page: 1, images: [] });
+    } else {
+      toast.info(`We already found images with ${searchQuery}.`);
+    }
   };
 
   handleLoadMore = () => {
